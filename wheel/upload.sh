@@ -15,17 +15,12 @@ if [[ -z "$MAC_LIBTORCH_FINAL_FOLDER" ]]; then
     MAC_LIBTORCH_FINAL_FOLDER='libtorch'
 fi
 
-
-# Upload wheels to s3
-if [[ -d "$MAC_WHEEL_FINAL_FOLDER" ]]; then
-    s3_dir="s3://pytorch/whl/${PIP_UPLOAD_FOLDER}cpu/"
-    echo "Uploading all of: $(ls $MAC_WHEEL_FINAL_FOLDER) to $s3_dir"
-    ls "$MAC_WHEEL_FINAL_FOLDER" | xargs -I {} aws s3 cp "$MAC_WHEEL_FINAL_FOLDER"/{} "$s3_dir" --acl public-read
-fi
+export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
+export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
 
 # Upload libtorch packages to s3
 if [[ -d "$MAC_LIBTORCH_FINAL_FOLDER" ]]; then
-    s3_dir="s3://pytorch/libtorch/${PIP_UPLOAD_FOLDER}cpu/"
+    s3_dir="s3://pytorch-binary-tmp-yf225/libtorch/${PIP_UPLOAD_FOLDER}cpu/"
     echo "Uploading all of: $(ls $MAC_LIBTORCH_FINAL_FOLDER) to $s3_dir"
     ls "$MAC_LIBTORCH_FINAL_FOLDER" | xargs -I {} aws s3 cp "$MAC_LIBTORCH_FINAL_FOLDER"/{} "$s3_dir" --acl public-read
 fi

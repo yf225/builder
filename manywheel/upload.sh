@@ -20,21 +20,17 @@ if [[ -z "$PIP_UPLOAD_FOLDER" ]]; then
     exit 1
 fi
 
+export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
+export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
+
 for cuda_ver in "${CUDA_VERSIONS[@]}"; do
-    s3_wheel_dir="s3://pytorch/whl/${PIP_UPLOAD_FOLDER}${cuda_ver}/"
-    s3_libtorch_dir="s3://pytorch/libtorch/${PIP_UPLOAD_FOLDER}${cuda_ver}/"
+    s3_libtorch_dir="s3://pytorch-binary-tmp-yf225/libtorch/${PIP_UPLOAD_FOLDER}${cuda_ver}/"
     if [[ "$cuda_ver" == cpu ]]; then
         wheel_dir="${PACKAGE_ROOT_DIR}/wheelhousecpu/"
         libtorch_dir="${PACKAGE_ROOT_DIR}/libtorch_housecpu/"
     else
         wheel_dir="${PACKAGE_ROOT_DIR}/wheelhouse${cuda_ver:2:2}/"
         libtorch_dir="${PACKAGE_ROOT_DIR}/libtorch_house${cuda_ver:2:2}/"
-    fi
-
-    # Upload the wheels to s3
-    if [[ -d "$wheel_dir" ]]; then
-        echo "Uploading all of: $(ls $wheel_dir) to $s3_wheel_dir"
-        ls "$wheel_dir" | xargs -I {} aws s3 cp "$wheel_dir"/{} "$s3_wheel_dir" --acl public-read
     fi
 
     if [[ -d "$libtorch_dir" ]]; then
