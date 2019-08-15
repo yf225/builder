@@ -20,9 +20,6 @@ if [[ -z "$PIP_UPLOAD_FOLDER" ]]; then
     exit 1
 fi
 
-export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
-export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
-
 for cuda_ver in "${CUDA_VERSIONS[@]}"; do
     s3_libtorch_dir="s3://pytorch-binary-tmp-yf225/libtorch/${PIP_UPLOAD_FOLDER}${cuda_ver}/"
     if [[ "$cuda_ver" == cpu ]]; then

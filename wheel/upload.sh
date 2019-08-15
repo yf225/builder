@@ -15,9 +15,6 @@ if [[ -z "$MAC_LIBTORCH_FINAL_FOLDER" ]]; then
     MAC_LIBTORCH_FINAL_FOLDER='libtorch'
 fi
 
-export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
-export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY_FOR_PYTORCH_BINARY_TMP_BUCKET_YF225"
-
 # Upload libtorch packages to s3
 if [[ -d "$MAC_LIBTORCH_FINAL_FOLDER" ]]; then
     s3_dir="s3://pytorch-binary-tmp-yf225/libtorch/${PIP_UPLOAD_FOLDER}cpu/"
