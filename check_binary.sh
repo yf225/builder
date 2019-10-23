@@ -180,8 +180,27 @@ if [[ "$(uname)" != 'Darwin' ]]; then
 fi # if on Darwin
 
 ###############################################################################
+# Check for no Protobuf symbols
+###############################################################################
+# We have to loop through all shared libraries for this
+if [[ "$(uname)" == 'Darwin' ]]; then
+  echo "yf225 TODO: how to check symbol in OSX?"
+else
+  echo "Checking that there is no protobuf symbol exposed by libtorch.so"
+  grep_protobuf_symbols () {
+    nm "${install_root}/lib/libtorch.so" | c++filt | grep "google::protobuf" | grep -v "c10::" | grep -v "at::" | grep -v "caffe2::" | grep -v "torch::" | grep -v "onnx_torch::"
+  }
+  num_protobuf_symbols=$(grep_protobuf_symbols | wc -l) || true
+  echo "num_protobuf_symbols: " $num_protobuf_symbols
+  if [[ "$num_protobuf_symbols" -gt 0 ]]; then
+    echo "Found Protobuf symbols but there shouldn't be. Dumping symbols"
+    grep_protobuf_symbols
+    exit 1
+  fi
+fi
+
+###############################################################################
 # Check for no OpenBLAS
-# TODO Check for no Protobuf symbols (not finished)
 # Print *all* runtime dependencies
 ###############################################################################
 # We have to loop through all shared libraries for this
@@ -197,27 +216,11 @@ if [[ "$(uname)" == 'Darwin' ]]; then
       echo "Full dependencies is: $(otool -L $dylib)"
       exit 1
     fi
-
-    # Check for protobuf symbols
-    #proto_symbols="$(nm $dylib | grep protobuf)" || true
-    #if [[ -n "$proto_symbols" ]]; then
-    #  echo "ERROR: Detected protobuf symbols in $dylib"
-    #  echo "Symbols are $proto_symbols"
-    #  exit 1
-    #fi
   done
 else
   all_libs=($(find "$install_root" -name '*.so'))
   for lib in "${all_libs[@]}"; do
     echo "All dependencies of $lib are $(ldd $lib) with runpath $(objdump -p $lib | grep RUNPATH)"
-
-    # Check for protobuf symbols
-    #proto_symbols=$(nm $lib | grep protobuf) || true
-    #if [[ -n "$proto_symbols" ]]; then
-    #  echo "ERROR: Detected protobuf symbols in $lib"
-    #  echo "Symbols are $proto_symbols"
-    #  exit 1
-    #fi
   done
 fi
 
